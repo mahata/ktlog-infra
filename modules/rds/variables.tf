@@ -1,0 +1,10 @@
+variable "project" {}
+variable "environment" {}
+variable "common_tags" {}
+variable "vpc_id" {}
+variable "beanstalk_security_group_id" {}
+variable "private_subnet_ids" {}
+variable "multi_az" {}
+variable "rds_username" {}
+variable "rds_password" {}
+variable "rds_db_name" {}
