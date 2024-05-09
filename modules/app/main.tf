@@ -24,7 +24,6 @@ resource "aws_security_group" "beanstalk" {
 resource "aws_elastic_beanstalk_application" "ktlog" {
   name        = "${var.project}-${var.environment}"
   description = "${var.project}-${var.environment}"
-  tags        = var.common_tags
 }
 
 resource "aws_elastic_beanstalk_environment" "ktlog" {
