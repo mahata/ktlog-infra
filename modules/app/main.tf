@@ -76,6 +76,12 @@ resource "aws_elastic_beanstalk_environment" "ktlog" {
 
   setting {
     namespace = "aws:ec2:vpc"
+    name      = "ELBScheme"
+    value     = "internet facing"
+  }
+
+  setting {
+    namespace = "aws:ec2:vpc"
     name      = "ELBSubnets"
     value     = join(",", var.public_subnet_ids)
   }
@@ -147,6 +153,35 @@ resource "aws_elastic_beanstalk_environment" "ktlog" {
     name      = "SPRING_DATASOURCE_PASSWORD"
     value     = var.rds_password
   }
+}
+
+data "aws_lb" "beanstalk_alb" {
+  arn = aws_elastic_beanstalk_environment.ktlog.load_balancers[0]
+}
+
+resource "aws_lb_listener" "https_redirect" {
+  load_balancer_arn = data.aws_lb.beanstalk_alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_security_group_rule" "allow_80" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = tolist(data.aws_lb.beanstalk_alb.security_groups)[0]
 }
 
 resource "aws_security_group" "rds" {

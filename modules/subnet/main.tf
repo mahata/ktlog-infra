@@ -9,8 +9,10 @@ resource "aws_subnet" "public" {
   tags = var.common_tags
 }
 
-resource "aws_route_table_association" "public_1" {
-  subnet_id      = aws_subnet.public["public_1"].id
+resource "aws_route_table_association" "public" {
+  for_each = toset(["public_1", "public_2", "public_3"])
+
+  subnet_id      = aws_subnet.public[each.key].id
   route_table_id = var.public_route_table_id
 }
 
